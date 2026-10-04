@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 projects/*/.status-heartbeat.log
+projects/*/.venv/
+projects/*/*.db
+projects/*/src/__pycache__/

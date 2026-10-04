@@ -18,7 +18,11 @@ else
   TARGET="."
 fi
 
-if ! command -v pytest >/dev/null 2>&1; then
+if [[ -x "$TARGET/.venv/bin/pytest" ]]; then
+  PYTEST="$TARGET/.venv/bin/pytest"
+elif command -v pytest >/dev/null 2>&1; then
+  PYTEST="pytest"
+else
   echo "run-tests: pytest not installed; skipping test run." >&2
   exit 0
 fi
@@ -28,6 +32,6 @@ if [[ ! -d "$TARGET/tests" ]]; then
   exit 0
 fi
 
-echo "run-tests: executing pytest in $TARGET" >&2
-( cd "$TARGET" && pytest -q ) 2>&1 | tail -40 >&2 || true
+echo "run-tests: executing $PYTEST in $TARGET" >&2
+( cd "$TARGET" && "$PYTEST" -q ) 2>&1 | tail -40 >&2 || true
 exit 0

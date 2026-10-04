@@ -26,9 +26,21 @@ elif command -v black >/dev/null 2>&1; then
   black --check "$TARGET" 2>&1 | tail -30 >&2 || true
 fi
 
+# Pick a Python interpreter: prefer a project venv, then python3, then python.
+if [[ -n "${KIRO_PROJECT_SLUG:-}" && -x "projects/${KIRO_PROJECT_SLUG}/.venv/bin/python" ]]; then
+  PY="projects/${KIRO_PROJECT_SLUG}/.venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+  PY="python3"
+elif command -v python >/dev/null 2>&1; then
+  PY="python"
+else
+  echo "lint: no python interpreter found; skipping." >&2
+  exit 0
+fi
+
 # Minimum gate: byte-compile every .py to catch syntax errors.
-echo "lint: py_compile syntax check on $TARGET" >&2
+echo "lint: py_compile syntax check on $TARGET (using $PY)" >&2
 find "$TARGET" -name '*.py' -print0 2>/dev/null \
-  | xargs -0 -I{} python -m py_compile "{}" 2>&1 | tail -30 >&2 || true
+  | xargs -0 -I{} "$PY" -m py_compile "{}" 2>&1 | tail -30 >&2 || true
 
 exit 0
