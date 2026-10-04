@@ -18,12 +18,15 @@ else
   TARGET="."
 fi
 
-if [[ -x "$TARGET/.venv/bin/pytest" ]]; then
-  PYTEST="$TARGET/.venv/bin/pytest"
+if [[ -x "$TARGET/.venv/bin/python" ]]; then
+  # Execution below cd's into $TARGET, so reference the venv relative to it.
+  PYTEST=(".venv/bin/python" -m pytest)
 elif command -v pytest >/dev/null 2>&1; then
-  PYTEST="pytest"
+  PYTEST=(pytest)
+elif command -v python3 >/dev/null 2>&1; then
+  PYTEST=(python3 -m pytest)
 else
-  echo "run-tests: pytest not installed; skipping test run." >&2
+  echo "run-tests: no pytest/python available; skipping test run." >&2
   exit 0
 fi
 
@@ -32,6 +35,6 @@ if [[ ! -d "$TARGET/tests" ]]; then
   exit 0
 fi
 
-echo "run-tests: executing $PYTEST in $TARGET" >&2
-( cd "$TARGET" && "$PYTEST" -q ) 2>&1 | tail -40 >&2 || true
+echo "run-tests: executing (${PYTEST[*]}) -q in $TARGET" >&2
+( cd "$TARGET" && "${PYTEST[@]}" -q ) 2>&1 | tail -40 >&2 || true
 exit 0
