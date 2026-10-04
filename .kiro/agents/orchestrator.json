@@ -6,11 +6,36 @@
     "read",
     "write",
     "shell",
-    "subagent"
+    "subagent",
+    "@git"
   ],
   "allowedTools": [
-    "read"
+    "read",
+    "@git/git_status",
+    "@git/git_log",
+    "@git/git_diff",
+    "@git/git_diff_staged",
+    "@git/git_diff_unstaged",
+    "@git/git_show"
   ],
+  "mcpServers": {
+    "git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git",
+        "--repository",
+        "/Users/sharunikaass/Documents/kiro-proj"
+      ],
+      "timeout": 120000,
+      "disabledTools": [
+        "git_create_branch",
+        "git_checkout",
+        "git_reset",
+        "git_init",
+        "git_branch"
+      ]
+    }
+  },
   "toolsSettings": {
     "write": {
       "allowedPaths": [
@@ -53,7 +78,7 @@
   "hooks": {
     "agentSpawn": [
       {
-        "command": "python --version 2>&1; pytest --version 2>&1 || echo 'pytest not installed'"
+        "command": "python --version 2>&1; pytest --version 2>&1 || echo 'pytest not installed'; uvx --version 2>&1 || echo 'uvx MISSING (Git MCP will not start)'; git -C /Users/sharunikaass/Documents/kiro-proj rev-parse --is-inside-work-tree >/dev/null 2>&1 && echo 'git repo: OK' || echo 'git repo: MISSING'"
       }
     ],
     "stop": [

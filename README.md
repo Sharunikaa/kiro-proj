@@ -47,9 +47,37 @@ approve the architecture.
   heartbeat, an artifact-header validator, and a `preToolUse` guard that blocks
   the Security Reviewer from writing to `src/`.
 - **Specs** — `.kiro/specs/expense-tracker/{requirements,design,tasks}.md`.
-- **MCP** — `.kiro/settings/mcp.json` configures a minimal `git` server; a
-  `github` server is included but `disabled` until you set `GITHUB_TOKEN` and add
-  its tools to an agent.
+- **MCP** — the **orchestrator** runs a minimal `git` MCP server (`uvx
+  mcp-server-git`) pinned to this repository. It uses Git MCP meaningfully during
+  the pipeline (see "Git MCP workflow" below). A `github` server stub exists in
+  `.kiro/settings/mcp.json` but is `disabled` until you set `GITHUB_TOKEN`.
+
+## Git MCP workflow
+
+The orchestrator integrates Git MCP as the system of record for pipeline
+progress. Only the orchestrator has git tools; the six role agents do not.
+
+Tools and trust:
+
+| Tool | When used | Trust |
+|---|---|---|
+| `@git/git_status` | At project start, before scaffolding | Auto-approved (read-only) |
+| `@git/git_diff` | After a stage writes artifacts, to show real changes | Auto-approved (read-only) |
+| `@git/git_log` | When reporting progress / history | Auto-approved (read-only) |
+| `@git/git_add` | After a phase completes (and is approved) | **Requires confirmation** |
+| `@git/git_commit` | To record an approved phase as a commit | **Requires confirmation** |
+
+Branch/checkout/reset/init operations are **disabled** (`disabledTools`) to keep
+scope minimal and avoid destructive actions. The server is restricted to this
+repo via `--repository`.
+
+Typical flow per phase: stage runs → `git_diff` shows what changed → phase
+summary → (at Requirements/Architecture gates) you approve → orchestrator asks to
+`git_add` + `git_commit` the approved artifact with a conventional message.
+
+Requirements: `uvx` (from `uv`) and `git` must be on PATH, and the project
+directory must be a git repository. The orchestrator's `agentSpawn` hook prints
+`git repo: OK/MISSING` and flags a missing `uvx` at startup.
 
 ## Prerequisites
 

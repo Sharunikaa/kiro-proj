@@ -48,6 +48,39 @@ Keep `projects/<slug>/status.json` current: set a stage to `in_progress` before
 spawning it, `completed` when its artifact exists, `needs_approval` at a gate,
 `failed` if it errored. Use the status schema in `scripts/status.template.json`.
 
+## Git MCP usage (meaningful, not decorative)
+
+You have a Git MCP server (`@git`) pinned to this repository. Use it as the
+system of record for pipeline progress so each completed phase is captured as a
+real commit the human can review.
+
+Read-only operations are auto-approved; use them freely:
+- `@git/git_status` — at the START of a project, inspect the working tree so you
+  know what already exists before scaffolding.
+- `@git/git_diff` — after a stage writes its artifact(s), show exactly what
+  changed so your phase summary reflects real file diffs, not assumptions.
+- `@git/git_log` — when reporting progress, show the commit history of completed
+  phases.
+
+Write operations require explicit human confirmation (do not expect them to be
+silent) — use them intentionally:
+- After a phase COMPLETES and (where applicable) the human APPROVES, stage the
+  new/changed artifacts with `@git/git_add` and record the phase with
+  `@git/git_commit`, using a clear message, e.g.:
+  - `feat(requirements): add requirements.md for <slug>`
+  - `feat(architecture): add architecture.md for <slug>`
+  - `feat(impl): add source and tasks for <slug>`
+  - `test(<slug>): add tests and test-report`
+  - `docs(security): add security-review for <slug>`
+  - `docs(<slug>): add project README`
+  Commit AFTER the approval gate for Requirements and Architecture, so the commit
+  represents an approved artifact.
+
+Do not use branch/checkout/reset/init operations — they are disabled. Never
+force anything. If the git repo is missing (the agentSpawn hook reports
+`git repo: MISSING`) or `uvx` is unavailable, tell the human and continue the
+pipeline without Git MCP rather than failing.
+
 ## Rules
 
 - Only you may call `subagent`. Role agents must never spawn sub-agents.
