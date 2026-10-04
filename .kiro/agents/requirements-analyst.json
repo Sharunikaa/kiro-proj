@@ -1,0 +1,38 @@
+{
+  "name": "requirements-analyst",
+  "description": "Turns a software idea into functional requirements, user stories, and acceptance criteria. Writes requirements.md.",
+  "prompt": "file:///Users/sharunikaass/Documents/kiro-proj/.kiro/agents/prompts/requirements-analyst.md",
+  "tools": [
+    "read",
+    "write"
+  ],
+  "allowedTools": [
+    "read"
+  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "projects/**",
+        ".kiro/specs/**"
+      ]
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/requirements-authoring/SKILL.md",
+    "file://spec.md"
+  ],
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "write",
+        "command": ".kiro/hooks/validate-artifacts.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".kiro/hooks/update-status.sh"
+      }
+    ]
+  }
+}

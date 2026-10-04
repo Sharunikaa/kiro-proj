@@ -1,0 +1,52 @@
+{
+  "name": "tester",
+  "description": "Writes and runs automated tests for the generated project. Writes tests/ and test-report.md. Does not edit source code.",
+  "prompt": "file:///Users/sharunikaass/Documents/kiro-proj/.kiro/agents/prompts/tester.md",
+  "tools": [
+    "read",
+    "write",
+    "shell"
+  ],
+  "allowedTools": [
+    "read"
+  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "projects/**/tests/**",
+        "projects/**/test-report.md"
+      ],
+      "deniedPaths": [
+        "projects/**/src/**"
+      ]
+    },
+    "shell": {
+      "allowedCommands": [
+        "pytest.*",
+        "python -m pytest.*",
+        "python .*",
+        "python3 .*",
+        "ls .*",
+        "cat .*"
+      ],
+      "autoAllowReadonly": true
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/testing/SKILL.md"
+  ],
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "shell",
+        "command": ".kiro/hooks/run-tests.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".kiro/hooks/update-status.sh"
+      }
+    ]
+  }
+}

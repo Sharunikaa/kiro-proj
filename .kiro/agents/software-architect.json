@@ -1,0 +1,37 @@
+{
+  "name": "software-architect",
+  "description": "Turns approved requirements into a system architecture, API design, and data model. Writes architecture.md.",
+  "prompt": "file:///Users/sharunikaass/Documents/kiro-proj/.kiro/agents/prompts/software-architect.md",
+  "tools": [
+    "read",
+    "write"
+  ],
+  "allowedTools": [
+    "read"
+  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "projects/**",
+        ".kiro/specs/**"
+      ]
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/software-architecture/SKILL.md"
+  ],
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "write",
+        "command": ".kiro/hooks/validate-artifacts.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".kiro/hooks/update-status.sh"
+      }
+    ]
+  }
+}

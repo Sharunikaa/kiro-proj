@@ -1,0 +1,67 @@
+{
+  "name": "orchestrator",
+  "description": "Project Manager and pipeline orchestrator for the AI Software Engineering Team. The only agent allowed to spawn sub-agents; drives the lifecycle with human approval gates.",
+  "prompt": "file:///Users/sharunikaass/Documents/kiro-proj/.kiro/agents/prompts/orchestrator.md",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "subagent"
+  ],
+  "allowedTools": [
+    "read"
+  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "projects/**"
+      ]
+    },
+    "shell": {
+      "allowedCommands": [
+        "scripts/new-project.sh.*",
+        "mkdir .*",
+        "cat .*",
+        "ls .*"
+      ],
+      "autoAllowReadonly": true
+    },
+    "crew": {
+      "availableAgents": [
+        "requirements-analyst",
+        "software-architect",
+        "developer",
+        "tester",
+        "security-reviewer",
+        "documentation-agent"
+      ],
+      "trustedAgents": [
+        "requirements-analyst",
+        "software-architect",
+        "developer",
+        "tester",
+        "security-reviewer",
+        "documentation-agent"
+      ]
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md",
+    "file://spec.md",
+    "file://projects/**/status.json"
+  ],
+  "hooks": {
+    "agentSpawn": [
+      {
+        "command": "python --version 2>&1; pytest --version 2>&1 || echo 'pytest not installed'"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".kiro/hooks/update-status.sh"
+      }
+    ]
+  },
+  "keyboardShortcut": "ctrl+shift+o",
+  "welcomeMessage": "AI Software Engineering Team orchestrator ready. Give me a project idea to begin."
+}

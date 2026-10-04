@@ -1,0 +1,24 @@
+{
+  "project": "",
+  "slug": "",
+  "created_at": "",
+  "updated_at": "",
+  "current_stage": "requirements",
+  "progress_percent": 0,
+  "stages": {
+    "project-manager": "completed",
+    "requirements": "pending",
+    "architecture": "pending",
+    "development": "pending",
+    "testing": "pending",
+    "security": "pending",
+    "documentation": "pending"
+  },
+  "legend": {
+    "pending": "\u25cb",
+    "in_progress": "\u25cf",
+    "completed": "\u2713",
+    "failed": "\u2715",
+    "needs_approval": "\u26a0"
+  }
+}

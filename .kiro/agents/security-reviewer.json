@@ -1,0 +1,42 @@
+{
+  "name": "security-reviewer",
+  "description": "Reviews generated code for security issues. Read-only over source; writes only security-review.md.",
+  "prompt": "file:///Users/sharunikaass/Documents/kiro-proj/.kiro/agents/prompts/security-reviewer.md",
+  "tools": [
+    "read",
+    "grep",
+    "write"
+  ],
+  "allowedTools": [
+    "read",
+    "grep"
+  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "projects/**/security-review.md"
+      ],
+      "deniedPaths": [
+        "projects/**/src/**",
+        "projects/**/tests/**"
+      ]
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/security-review/SKILL.md"
+  ],
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "write",
+        "command": ".kiro/hooks/block-src-write.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".kiro/hooks/update-status.sh"
+      }
+    ]
+  }
+}

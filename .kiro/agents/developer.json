@@ -1,0 +1,55 @@
+{
+  "name": "developer",
+  "description": "Implements the approved architecture as working source code. Writes tasks.md and source under the project src/.",
+  "prompt": "file:///Users/sharunikaass/Documents/kiro-proj/.kiro/agents/prompts/developer.md",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "code"
+  ],
+  "allowedTools": [
+    "read",
+    "code"
+  ],
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "projects/**"
+      ],
+      "deniedPaths": [
+        "projects/**/requirements.md",
+        "projects/**/architecture.md"
+      ]
+    },
+    "shell": {
+      "allowedCommands": [
+        "python .*",
+        "python3 .*",
+        "pytest.*",
+        "ruff.*",
+        "black.*",
+        "mkdir .*",
+        "ls .*",
+        "cat .*"
+      ],
+      "autoAllowReadonly": true
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md"
+  ],
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "write",
+        "command": ".kiro/hooks/lint.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".kiro/hooks/update-status.sh"
+      }
+    ]
+  }
+}
